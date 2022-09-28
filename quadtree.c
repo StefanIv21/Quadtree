@@ -372,7 +372,7 @@ int main(int argc, char * argv[])
 		free_tree ( tree );
 		fclose(f);
 		}
-	if (strcmp(argv[1], "-d") == 0)
+	if (strstr(argv[1], "-d"))
 		{
 			
 			unsigned int nr;
