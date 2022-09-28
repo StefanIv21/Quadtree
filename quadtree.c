@@ -194,7 +194,43 @@ void free_tree ( Nod root )
 	}
 	free ( root );
 }
+void tree(QuadtreeNode * vec, Nod *node, int i)
+{
+	Nod nod = malloc(sizeof(Tree));
+	nod->red   = vec[i].red;
+	nod->blue  = vec[i].blue;
+	nod->green = vec[i].green;
+	nod->area  = vec[i].area;
+	*node = nod;
+	Nod copie = *node;
 
+	if(vec[i].top_left != -1 )
+	{
+		tree(vec, &(copie)->top_left,     vec[i].top_left);
+		tree(vec, &(copie)->top_right,    vec[i].top_right);
+		tree(vec, &(copie)->bottom_left,  vec[i].bottom_left);
+		tree(vec, &(copie)->bottom_right, vec[i].bottom_right);
+
+	}
+	else
+	{
+		copie->top_left     = NULL;
+		copie->top_right    = NULL;
+		copie->bottom_left  = NULL;
+		copie->bottom_right = NULL;
+	}
+
+}
+void scrie(pixel ** imag, char * file, int width)
+{
+	FILE * f = fopen(file, "w");
+	fprintf(f, "P6\n");
+	fprintf(f, "%d %d\n", width, width );
+	fprintf(f, "255\n");
+	for(int i = 0; i < width; i++)
+		fwrite(imag[i], sizeof(pixel), width, f);
+	fclose(f);
+}
 int main(int argc, char * argv[])
 {
 	if (strstr(argv[1], "-c") )
@@ -335,6 +371,39 @@ int main(int argc, char * argv[])
 		free(a);
 		free_tree ( tree );
 		fclose(f);
+		}
+	if (strcmp(argv[1], "-d") == 0)
+		{
+			
+			unsigned int nr;
+			unsigned int colors;
+			FILE * f = fopen(argv[2], "rb");
+			fread(&colors, sizeof(int), 1, f);
+			fread(&nr,  sizeof(int), 1, f);			
+			QuadtreeNode * vec = malloc(sizeof(QuadtreeNode) * nr);
+			fread(vec, sizeof(QuadtreeNode), nr, f);
+			fclose(f);
+
+			Nod node = NULL;
+			tree(vec, &node, 0);
+			free(vec);
+			uint32_t width = sqrt(node->area);
+			uint32_t height =width;
+								
+			pixel **a = malloc(sizeof(pixel*) * height);
+			for(int i = 0; i < height; i++)
+			{	
+			a[i] = malloc(sizeof(pixel) * width);
+			}
+			
+			decompresie(node, a, 0, 0, width);
+			scrie(a, argv[3], width);
+
+		
+			for(int i = 0; i < width; i++)
+				free(a[i]);
+			free(a);
+
 		}
 	return 0;
 }
