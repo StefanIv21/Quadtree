@@ -41,7 +41,7 @@ To use the program, follow these steps:
 - run make
 - run the following command:
   
-      ./quadtree [-c factor |  -m type] [input_file1] [output_file] where:
+      ./quadtree [-c factor | -d |  -m type] [input_file1] [output_file] where:
   
  -c factor indicates that the program will compress the image (factor = threshold imposed for compression)
 
